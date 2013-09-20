@@ -2,6 +2,11 @@
   font-family: helvetica;
 }
 
+#errors {
+  text-align: center;
+  color: red;
+}
+
 hr {
   color: #686868;
   width: 400px;

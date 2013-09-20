@@ -1,7 +1,7 @@
-%w(sinatra active_record twilio-ruby validates_phone_number).each{|x| require x}
+%w(sinatra sinatra/flash active_record twilio-ruby validates_phone_number).each{|x| require x}
 
 ActiveRecord::Base.establish_connection(ENV['DATABASE_URL'] || 'postgres://localhost/lincolnprogramming')
-
+enable :sessions
 twilio = Twilio::REST::Client.new(ENV['TWILIO_SID'], ENV['TWILIO_AUTH_TOKEN'])
 
 class Member < ActiveRecord::Base
@@ -17,12 +17,15 @@ end
 post '/member/new' do
   member = Member.new(name: params[:name], phone: params[:phone], email: params[:email])
 
-  if member.save!
+  if member.save
     twilio.account.messages.create(
       :from => ENV['TWILIO_NUMBER'],
       :to => '+1' + member.phone,
       :body => "Welcome to Lincoln Programming, #{member.name}! We'll alert you here the morning of our next meeting."
     )
+    redirect '/'
+  else
+    flash[:errors] = member.errors.full_messages.join(', ').downcase
     redirect '/'
   end
 end
