@@ -1,17 +1,8 @@
-%w(sinatra active_record open-uri twilio-ruby validates_phone_number).each{|x| require x}
+%w(sinatra active_record twilio-ruby validates_phone_number).each{|x| require x}
 
-ENV['RACK_ENV'] == 'production' ? db = URI.parse(ENV['DATABASE_URL']) : db = URI.parse('postgres://localhost/lincolnprogramming')
+ActiveRecord::Base.establish_connection(ENV['DATABASE_URL'] || 'postgres://localhost/lincolnprogramming')
 
 twilio = Twilio::REST::Client.new(ENV['TWILIO_SID'], ENV['TWILIO_AUTH_TOKEN'])
-
-ActiveRecord::Base.establish_connection(
-  :adapter  => 'postgresql',
-  :host     => db.host,
-  :username => db.user,
-  :password => db.password,
-  :database => db.path[1..-1],
-  :encoding => 'utf8'
-)
 
 class Member < ActiveRecord::Base
   validates :name, presence: true
