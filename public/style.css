@@ -1,12 +1,25 @@
 * {
   font-family: helvetica;
-  text-align: center;
+}
+
+hr {
+  color: #686868;
+  width: 400px;
+  height: 5px;
+}
+
+#home form {
+  margin-top: 10px;
 }
 
 #home {
   margin-top: 15%;
+  color: #686868;
+  font-weight: 200;
+  text-align: center;
 }
 
 #home p {
   margin-top: -10px;
+  margin-bottom: 40px;
 }
