@@ -1,9 +1,9 @@
 %w(sinatra active_record open-uri).each{|x| require x}
 
-db = (ENV['DATABASE_URL'] || URI.parse('postgres://localhost/lincolnprogramming'))
+db = (URI.parse(ENV['DATABASE_URL']) || URI.parse('postgres://localhost/lincolnprogramming'))
 
 ActiveRecord::Base.establish_connection(
-  :adapter  => db.scheme == 'postgres' ? 'postgresql' : db.scheme,
+  :adapter  => 'postgresql',
   :host     => db.host,
   :username => db.user,
   :password => db.password,
