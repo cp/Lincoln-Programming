@@ -32,8 +32,8 @@ end
 
 post '/message/new' do # Accept SMS messages through Twilio.
   status 500 unless validate_twilio_request
-  body = params['body']
-  from = params['from']
+  body = params['Body']
+  from = params['From']
   
   # Since we don't yet have members' phone numbers,
   # this will allow them to text in their email, and
