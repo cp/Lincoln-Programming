@@ -29,3 +29,38 @@ post '/member/new' do
     redirect '/'
   end
 end
+
+post '/message/new' do # Accept SMS messages through Twilio.
+  status 500 unless validate_twilio_request
+  body = params['body']
+  from = params['from']
+  
+  # Since we don't yet have members' phone numbers,
+  # this will allow them to text in their email, and
+  # add their phone number to their account.
+  if body.length > 5 && body.split('').include?('@')
+    if member = Member.find_by_email(body)
+      member.phone = from[2..-1]
+      if member.save(validate: false)
+        Twilio::TwiML::Response.new do |r|
+          r.Sms "Your phone number was successfully added"
+        end.text
+      end
+    else
+      Twilio::TwiML::Response.new do |r|
+        r.Sms "We could not find your account. Creat one at lincolnprogramming.com"
+      end.text
+    end
+  else
+    Twilio::TwiML::Response.new do |r|
+      r.Sms "Hello! Welcome to the Lincoln Programming Club. Read more and sign up at lincolnprogramming.com"
+    end.text
+  end
+
+end
+
+def validate_twilio_request
+  sig = request.env['X-Twilio-Signature']
+  validator = Twilio::Util::RequestValidator.new(ENV['TWILIO_AUTH_TOKEN'])
+  validator.validate('http://lincolnprogramming.com/message/new', params, sig)
+end
