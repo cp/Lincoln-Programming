@@ -1,0 +1,12 @@
+* {
+  font-family: helvetica;
+  text-align: center;
+}
+
+#home {
+  margin-top: 15%;
+}
+
+#home p {
+  margin-top: -10px;
+}
