@@ -31,7 +31,7 @@ post '/member/new' do
 end
 
 post '/message/new' do # Accept SMS messages through Twilio.
-  status 500 unless validate_twilio_request
+  #  status 500 unless validate_twilio_request
   body = params['Body']
   from = params['From']
   
@@ -59,8 +59,8 @@ post '/message/new' do # Accept SMS messages through Twilio.
 
 end
 
-def validate_twilio_request
-  sig = request.env['X-Twilio-Signature']
-  validator = Twilio::Util::RequestValidator.new(ENV['TWILIO_AUTH_TOKEN'])
-  validator.validate('http://lincolnprogramming.com/message/new', params, sig)
-end
+# def validate_twilio_request
+#   sig = request.env['X-Twilio-Signature']
+#   validator = Twilio::Util::RequestValidator.new(ENV['TWILIO_AUTH_TOKEN'])
+#   validator.validate(request.url, params, sig)
+# end
