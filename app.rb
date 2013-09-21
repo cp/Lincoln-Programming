@@ -33,14 +33,14 @@ end
 post '/message/new' do # Accept SMS messages through Twilio.
   status 500 unless validate_twilio_request
   body = params['Body']
-  from = params['From']
+  from = params['From'][2..-1]
   
   # Since we don't yet have members' phone numbers,
   # this will allow them to text in their email, and
   # add their phone number to their account.
   if body.length > 5 && body.split('').include?('@')
     if member = Member.find_by_email(body)
-      member.phone = from[2..-1]
+      member.phone = from
       if member.save(validate: false)
         Twilio::TwiML::Response.new do |r|
           r.Sms "Your phone number was successfully added"
@@ -51,6 +51,11 @@ post '/message/new' do # Accept SMS messages through Twilio.
         r.Sms "We could not find your account. Creat one at lincolnprogramming.com"
       end.text
     end
+  elsif body == 'unsubscribe'
+    Member.find_by_phone(from).destroy
+    Twilio::TwiML::Response.new do |r|
+      r.Sms "Your membership has been removed from the database, and you will not recieve any more notifications."
+    end.text
   else
     Twilio::TwiML::Response.new do |r|
       r.Sms "Hello! Welcome to the Lincoln Programming Club. Read more and sign up at lincolnprogramming.com"
@@ -60,6 +65,7 @@ post '/message/new' do # Accept SMS messages through Twilio.
 end
 
 def validate_twilio_request
+  return true unless ENV['RACK_ENV'] == 'production'
   validator = Twilio::Util::RequestValidator.new(ENV['TWILIO_AUTH_TOKEN'])
   validator.validate(request.url, params, request.env['HTTP_X_TWILIO_SIGNATURE'])
 end
