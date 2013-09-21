@@ -44,8 +44,10 @@ post '/message/new' do # Accept SMS messages through Twilio.
       if member.save(validate: false)
         generate_sms_twiml "Your phone number was successfully added."
       end
-    else
-      generate_sms_twiml "We could not find your account. Creat one at lincolnprogramming.com"
+    elsif member = Member.new(email: body, phone: from)
+      if member.save(validate: false)
+        generate_sms_twiml "We couldn't find a membership with this email, so we went ahead and created a new one. Welcome!"
+      end
     end
   elsif body == 'unsubscribe'
     Member.find_by_phone(from).destroy
