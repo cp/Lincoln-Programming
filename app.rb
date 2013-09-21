@@ -23,6 +23,7 @@ post '/member/new' do
       :to => '+1' + member.phone,
       :body => "Welcome to Lincoln Programming, #{member.name}! We'll alert you here the morning of our next meeting."
     )
+    flash[:message] = "Welcome, #{member.name}! You should recieve a confirmation text message shortly."
     redirect '/'
   else
     flash[:errors] = member.errors.full_messages.join(', ').downcase

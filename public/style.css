@@ -7,6 +7,11 @@
   color: red;
 }
 
+#message {
+  text-align: center;
+  color: green;
+}
+
 hr {
   color: #686868;
   width: 400px;

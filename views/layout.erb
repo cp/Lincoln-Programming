@@ -6,9 +6,13 @@
     <link rel="stylesheet" type="text/css" media="screen" href="/style.css">
   </head>
   <body>
-    <% unless flash[:errors].nil? %>
+    <% if flash[:errors] %>
       <div id="errors">
         <%= 'ERRORS: ' + flash[:errors] %>
+      </div>
+    <% elsif flash[:message] %>
+      <div id="message">
+        <%= flash[:message] %>
       </div>
     <% end %>
     <%= yield %>
