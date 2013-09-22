@@ -54,11 +54,13 @@ post '/message/new' do # Accept SMS messages through Twilio.
     Member.find_by_phone(from).destroy
     generate_sms_twiml "Your membership has been removed from the database, and you will not recieve any more notifications."
   elsif body.split[0] == 'blast'
-    if Member.find_by_phone(from).is_admin
-      send_blast body.split[1..-1].join(' ')
-      generate_sms_twiml "Sent!"
-    else
-      generate_sms_twiml "You are not an admin, and do not have permission to do this."
+    if member = Member.find_by_phone(from)
+      if member.is_admin
+        send_blast body.split[1..-1].join(' ')
+        generate_sms_twiml "Sent!"
+      else
+        generate_sms_twiml "You are not an admin, and do not have permission to do this."
+      end
     end
   else
     generate_sms_twiml "Hello! Welcome to the Lincoln Programming Club. Read more and sign up at lincolnprogramming.com"
