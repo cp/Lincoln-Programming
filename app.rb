@@ -8,6 +8,10 @@ class Member < ActiveRecord::Base
   validates :name, presence: true
   validates :email, presence: true, uniqueness: true
   validates :phone, presence: true, uniqueness: true, phone_number: {:ten_digits => true}
+
+  def unsubscribe!
+    self.update_attributes(unsubscribed: true)
+  end
 end
 
 get '/' do
@@ -51,8 +55,8 @@ post '/message/new' do # Accept SMS messages through Twilio.
       end
     end
   elsif body == 'unsubscribe'
-    Member.find_by_phone(from).destroy
-    generate_sms_twiml "Your membership has been removed from the database, and you will not recieve any more notifications."
+    Member.find_by_phone(from).unsubscribe!
+    generate_sms_twiml "You have been unsubscribe, and you will not recieve any more notifications at this number."
   elsif body.split[0] == 'blast'
     if member = Member.find_by_phone(from)
       if member.is_admin
@@ -70,7 +74,7 @@ end
 
 def send_blast(message)
   # I really wish you could just send Twilio an array.
-  Member.where('phone IS NOT NULL').each do |member|
+  Member.where('phone IS NOT NULL').where(unsubscribed: false).each do |member|
     TWILIO.account.messages.create(
       from: ENV['TWILIO_NUMBER'],
       to: member.phone,
