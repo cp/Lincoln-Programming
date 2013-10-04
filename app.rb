@@ -1,4 +1,6 @@
-%w(sinatra sinatra/flash active_record twilio-ruby validates_phone_number).each{|x| require x}
+%w(sinatra sinatra/flash active_record twilio-ruby validates_phone_number dotenv).each{|x| require x}
+
+Dotenv.load! unless ENV['RACK_ENV'] == 'production'
 
 ActiveRecord::Base.establish_connection(ENV['DATABASE_URL'] || 'postgres://localhost/lincolnprogramming')
 enable :sessions
