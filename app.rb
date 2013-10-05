@@ -38,7 +38,7 @@ post '/member/new' do
 end
 
 post '/message/new' do # Accept SMS messages through Twilio.
-  status 500 unless validate_twilio_request
+  status 400 unless validate_twilio_request
   body = params['Body']
   from = params['From'][2..-1]
   
