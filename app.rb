@@ -1,4 +1,4 @@
-%w(sinatra sinatra/flash active_record twilio-ruby validates_phone_number dotenv).each{|x| require x}
+%w(sinatra sinatra/flash active_record twilio-ruby validates_phone_number dotenv typhoeus).each{|x| require x}
 
 Dotenv.load! unless ENV['RACK_ENV'] == 'production'
 
@@ -75,14 +75,17 @@ post '/message/new' do # Accept SMS messages through Twilio.
 end
 
 def send_blast(message)
-  # I really wish you could just send Twilio an array.
+  # Sending them concurrently like a boss.
+  hydra = Typhoeus::Hydra.new
   Member.where('phone IS NOT NULL').where(unsubscribed: false).each do |member|
-    TWILIO.account.messages.create(
-      from: ENV['TWILIO_NUMBER'],
-      to: member.phone,
-      body: message
-    )
+    hydra.queue(Typhoeus::Request.new(
+      "https://api.twilio.com/2010-04-01/Accounts/#{ENV['TWILIO_SID']}/Messages", 
+      method: :post,
+      body: { "To" => member.phone, "From" => ENV['TWILIO_NUMBER'], "Body" => message },
+      userpwd: "#{ENV['TWILIO_SID']}:#{ENV['TWILIO_AUTH_TOKEN']}"
+    ))
   end
+  hydra.run
 end
 
 def generate_sms_twiml(text)
